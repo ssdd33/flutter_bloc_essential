@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'dart:math';
+
+import 'package:flutter_block/theme/theme_bloc.dart';
 
 void main() {
   runApp(const MyApp());
@@ -9,13 +13,20 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'MyCounter Cubit',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return BlocProvider<ThemeBloc>(
+      create: (context) => ThemeBloc(),
+      child: BlocBuilder<ThemeBloc, ThemeState>(
+        builder: (context, state) {
+          return MaterialApp(
+            title: 'Event Payload',
+            debugShowCheckedModeBanner: false,
+            theme: state.appTheme == AppTheme.light
+                ? ThemeData.light()
+                : ThemeData.dark(),
+            home: const MyHomePage(),
+          );
+        },
       ),
-      home: const MyHomePage(),
     );
   }
 }
@@ -26,27 +37,22 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Text(
-          '0',
-          style: TextStyle(fontSize: 52.0),
-        ),
+      appBar: AppBar(
+        title: Text('theme'),
       ),
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-            onPressed: () {},
-            child: Icon(Icons.add),
-            heroTag: 'increment',
+      body: Center(
+        child: ElevatedButton(
+          child: Text(
+            'change Theme',
+            style: TextStyle(fontSize: 24),
           ),
-          SizedBox(width: 10.0),
-          FloatingActionButton(
-            onPressed: () {},
-            child: Icon(Icons.remove),
-            heroTag: 'decrement',
-          )
-        ],
+          onPressed: () {
+            final int randInt = Random().nextInt(10);
+            print('randInd : $randInt');
+
+            context.read<ThemeBloc>().add(ChangeThemeEvent(randInt: randInt));
+          },
+        ),
       ),
     );
   }
