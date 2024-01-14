@@ -2,7 +2,12 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'package:flutter_block/cubits/counter/counter_cubit.dart';
+import 'package:flutter_block/other_page.dart';
+
 import 'package:flutter_block/theme/theme_bloc.dart';
+
 
 void main() {
   runApp(MyApp());
@@ -37,22 +42,51 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('theme'),
-      ),
-      body: Center(
-        child: ElevatedButton(
-          child: Text(
-            'change Theme',
-            style: TextStyle(fontSize: 24),
-          ),
-          onPressed: () {
-            final int randInt = Random().nextInt(10);
-            print('randInd : $randInt');
 
-            context.read<ThemeBloc>().add(ChangeThemeEvent(randInt: randInt));
-          },
-        ),
+      body: BlocConsumer<CounterCubit, CounterState>(
+        listener: (context, state) {
+          if (state.counter == 3) {
+            showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                      content: Text('counter is ${state.counter}'));
+                });
+          } else if (state.counter == -1) {
+            Navigator.push(context, MaterialPageRoute(builder: (context) {
+              return OtherPage();
+            }));
+          }
+        },
+        builder: (context, state) {
+          return Center(
+            child: Text(
+              '${state.counter}',
+              style: TextStyle(fontSize: 52.0),
+            ),
+          );
+        },
+      ),
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            onPressed: () {
+              context.read<CounterCubit>().increment();
+            },
+            child: Icon(Icons.add),
+            heroTag: 'increment',
+          ),
+          SizedBox(width: 10.0),
+          FloatingActionButton(
+            onPressed: () {
+              context.read<CounterCubit>().decrement();
+            },
+            child: Icon(Icons.remove),
+            heroTag: 'decrement',
+          )
+        ],
+
       ),
     );
   }
