@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_block/blocs/counter/counter_bloc.dart';
-import 'package:flutter_block/other_page.dart';
+import 'package:flutter_block/cubits/counter/counter_cubit.dart';
 
 void main() {
   runApp(MyApp());
@@ -12,10 +11,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<CounterBloc>(
-      create: (context) => CounterBloc(),
+    return BlocProvider<CounterCubit>(
+      create: (context) => CounterCubit(),
       child: MaterialApp(
-        title: 'MyCounter bloc ',
+        title: 'MyCounter Cubit',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.blue,
@@ -32,39 +31,22 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocListener<CounterBloc, CounterState>(
-        listener: (context, state) {
-          if (state.counter == 3) {
-            showDialog(
-                context: context,
-                builder: (context) {
-                  return AlertDialog(
-                    content: Text('counter is ${state.counter}'),
-                  );
-                });
-          } else if (state.counter == -1) {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) {
-                return OtherPage();
-              }),
-            );
-          }
+      body: BlocBuilder<CounterCubit, CounterState>(
+        builder: (context, state) {
+          return Center(
+            child: Text(
+              '${state.counter}',
+              style: TextStyle(fontSize: 52.0),
+            ),
+          );
         },
-        child: Center(
-          child: Text(
-            '${context.watch<CounterBloc>().state.counter}',
-            style: TextStyle(fontSize: 52.0),
-          ),
-        ),
       ),
       floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           FloatingActionButton(
             onPressed: () {
-              BlocProvider.of<CounterBloc>(context)
-                  .add(IncrementCounterEvent());
+              BlocProvider.of<CounterCubit>(context).increment();
             },
             child: Icon(Icons.add),
             heroTag: 'increment',
@@ -72,8 +54,7 @@ class MyHomePage extends StatelessWidget {
           SizedBox(width: 10.0),
           FloatingActionButton(
             onPressed: () {
-              BlocProvider.of<CounterBloc>(context)
-                  .add(DecrementCounterEvent());
+              BlocProvider.of<CounterCubit>(context).decrement();
             },
             child: Icon(Icons.remove),
             heroTag: 'decrement',
