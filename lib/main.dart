@@ -2,12 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import 'package:flutter_block/cubits/counter/counter_cubit.dart';
-import 'package:flutter_block/other_page.dart';
-
-import 'package:flutter_block/theme/theme_bloc.dart';
-
+import 'package:flutter_block/bloc/theme/theme_bloc.dart';
 
 void main() {
   runApp(MyApp());
@@ -20,18 +15,16 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider<ThemeBloc>(
       create: (context) => ThemeBloc(),
-      child: BlocBuilder<ThemeBloc, ThemeState>(
-        builder: (context, state) {
-          return MaterialApp(
-            title: 'Event Payload',
-            debugShowCheckedModeBanner: false,
-            theme: state.appTheme == AppTheme.light
-                ? ThemeData.light()
-                : ThemeData.dark(),
-            home: const MyHomePage(),
-          );
-        },
-      ),
+      child: Builder(builder: (context) {
+        return MaterialApp(
+          title: 'Event Payload',
+          debugShowCheckedModeBanner: false,
+          theme: context.watch<ThemeBloc>().state.appTheme == AppTheme.light
+              ? ThemeData.light()
+              : ThemeData.dark(),
+          home: const MyHomePage(),
+        );
+      }),
     );
   }
 }
@@ -42,51 +35,22 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
-      body: BlocConsumer<CounterCubit, CounterState>(
-        listener: (context, state) {
-          if (state.counter == 3) {
-            showDialog(
-                context: context,
-                builder: (context) {
-                  return AlertDialog(
-                      content: Text('counter is ${state.counter}'));
-                });
-          } else if (state.counter == -1) {
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return OtherPage();
-            }));
-          }
-        },
-        builder: (context, state) {
-          return Center(
-            child: Text(
-              '${state.counter}',
-              style: TextStyle(fontSize: 52.0),
-            ),
-          );
-        },
+      appBar: AppBar(
+        title: Text('theme'),
       ),
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-            onPressed: () {
-              context.read<CounterCubit>().increment();
-            },
-            child: Icon(Icons.add),
-            heroTag: 'increment',
+      body: Center(
+        child: ElevatedButton(
+          child: Text(
+            'change Theme',
+            style: TextStyle(fontSize: 24),
           ),
-          SizedBox(width: 10.0),
-          FloatingActionButton(
-            onPressed: () {
-              context.read<CounterCubit>().decrement();
-            },
-            child: Icon(Icons.remove),
-            heroTag: 'decrement',
-          )
-        ],
+          onPressed: () {
+            int randomInt = Random().nextInt(10);
+            print(randomInt);
 
+            context.read<ThemeBloc>().add(ChangeThemeEvent(ranInt: randomInt));
+          },
+        ),
       ),
     );
   }
