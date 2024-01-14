@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:math';
 
-import 'package:flutter_block/theme/theme_bloc.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_block/bloc/theme/theme_bloc.dart';
 
 void main() {
   runApp(const MyApp());
@@ -47,10 +47,10 @@ class MyHomePage extends StatelessWidget {
             style: TextStyle(fontSize: 24),
           ),
           onPressed: () {
-            final int randInt = Random().nextInt(10);
-            print('randInd : $randInt');
+            int randomInt = Random().nextInt(10);
+            print(randomInt);
 
-            context.read<ThemeBloc>().add(ChangeThemeEvent(randInt: randInt));
+            context.read<ThemeBloc>().add(ChangeThemeEvent(ranInt: randomInt));
           },
         ),
       ),
