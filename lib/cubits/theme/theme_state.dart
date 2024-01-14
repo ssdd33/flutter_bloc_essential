@@ -1,4 +1,4 @@
-part of 'theme_bloc.dart';
+part of 'theme_cubit.dart';
 
 enum AppTheme { light, dark }
 
@@ -6,10 +6,10 @@ class ThemeState extends Equatable {
   final AppTheme appTheme;
 
   ThemeState({this.appTheme = AppTheme.light});
+
   factory ThemeState.initial() {
     return ThemeState();
   }
-
   ThemeState copyWith({
     AppTheme? appTheme,
   }) {
@@ -19,8 +19,8 @@ class ThemeState extends Equatable {
   }
 
   @override
-  List<Object> get props => [appTheme];
+  String toString() => 'ThemeState(appTheme: $appTheme)';
 
   @override
-  String toString() => 'ThemeState(appTheme: $appTheme)';
+  List<Object> get props => [appTheme];
 }
