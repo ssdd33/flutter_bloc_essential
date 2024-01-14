@@ -1,10 +1,16 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:flutter_block/cubits/counter/counter_cubit.dart';
 import 'package:flutter_block/other_page.dart';
 
+import 'package:flutter_block/theme/theme_bloc.dart';
+
+
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -12,15 +18,19 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<CounterCubit>(
-      create: (context) => CounterCubit(),
-      child: MaterialApp(
-        title: 'MyCounter Cubit',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        home: const MyHomePage(),
+    return BlocProvider<ThemeBloc>(
+      create: (context) => ThemeBloc(),
+      child: BlocBuilder<ThemeBloc, ThemeState>(
+        builder: (context, state) {
+          return MaterialApp(
+            title: 'Event Payload',
+            debugShowCheckedModeBanner: false,
+            theme: state.appTheme == AppTheme.light
+                ? ThemeData.light()
+                : ThemeData.dark(),
+            home: const MyHomePage(),
+          );
+        },
       ),
     );
   }
@@ -32,6 +42,7 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       body: BlocConsumer<CounterCubit, CounterState>(
         listener: (context, state) {
           if (state.counter == 3) {
@@ -75,6 +86,7 @@ class MyHomePage extends StatelessWidget {
             heroTag: 'decrement',
           )
         ],
+
       ),
     );
   }
