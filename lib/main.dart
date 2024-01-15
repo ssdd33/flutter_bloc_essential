@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_block/cubits/color/color_cubit.dart';
-import 'package:flutter_block/cubits/counter/counter_cubit.dart';
+import 'package:flutter_block/blocs/color/color_bloc.dart';
+import 'package:flutter_block/blocs/counter/counter_bloc.dart';
 
 void main() {
   runApp(MyApp());
@@ -14,15 +14,15 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider<ColorCubit>(create: (context) => ColorCubit()),
-        BlocProvider<CounterCubit>(
-          create: (context) => CounterCubit(
-            colorCubit: context.read<ColorCubit>(),
+        BlocProvider<ColorBloc>(create: (context) => ColorBloc()),
+        BlocProvider<CounterBloc>(
+          create: (context) => CounterBloc(
+            colorBloc: context.read<ColorBloc>(),
           ),
         ),
       ],
       child: MaterialApp(
-        title: 'Event Payload',
+        title: 'bloc2bloc',
         debugShowCheckedModeBanner: false,
         home: const MyHomePage(),
       ),
@@ -36,9 +36,9 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.watch<ColorCubit>().state.color,
+      backgroundColor: context.watch<ColorBloc>().state.color,
       appBar: AppBar(
-        title: Text('cubit2cubit'),
+        title: Text('bloc2bloc'),
       ),
       body: Center(
           child: Column(
@@ -46,14 +46,14 @@ class MyHomePage extends StatelessWidget {
         children: [
           ElevatedButton(
               onPressed: () {
-                context.read<ColorCubit>().changeColor();
+                context.read<ColorBloc>().add(ChangeColorEvent());
               },
               child: Text("change color")),
-          Text("${context.watch<CounterCubit>().state.counter}",
+          Text("${context.read<CounterBloc>().state.counter}",
               style: TextStyle(fontSize: 52)),
           ElevatedButton(
               onPressed: () {
-                context.read<CounterCubit>().changeCounter();
+                context.read<CounterBloc>().add(ChangeCounterEvent());
               },
               child: Text('increment'))
         ],

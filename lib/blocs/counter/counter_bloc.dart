@@ -3,18 +3,19 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_block/cubits/color/color_cubit.dart';
+import 'package:flutter_block/blocs/color/color_bloc.dart';
 
+part 'counter_event.dart';
 part 'counter_state.dart';
 
-class CounterCubit extends Cubit<CounterState> {
+class CounterBloc extends Bloc<CounterEvent, CounterState> {
   int incrementSize = 1;
-  final ColorCubit colorCubit;
+  final ColorBloc colorBloc;
   late final StreamSubscription colorSubscription;
-  CounterCubit({
-    required this.colorCubit,
+  CounterBloc({
+    required this.colorBloc,
   }) : super(CounterState.initial()) {
-    colorSubscription = colorCubit.stream.listen((ColorState colorState) {
+    colorSubscription = colorBloc.stream.listen((ColorState colorState) {
       print(colorState.color.toString());
       if (colorState.color == Colors.red) {
         incrementSize = 1;
@@ -26,9 +27,12 @@ class CounterCubit extends Cubit<CounterState> {
         incrementSize = 100;
       }
       if (colorState.color == Colors.black) {
-        emit(state.copyWith(counter: state.counter - 100));
         incrementSize = -100;
+        add(ChangeCounterEvent());
       }
+    });
+    on<ChangeCounterEvent>((event, emit) {
+      emit(state.copyWith(counter: state.counter + incrementSize));
     });
   }
 
@@ -37,9 +41,5 @@ class CounterCubit extends Cubit<CounterState> {
     colorSubscription.cancel();
 
     return super.close();
-  }
-
-  void changeCounter() {
-    emit(state.copyWith(counter: state.counter + incrementSize));
   }
 }
