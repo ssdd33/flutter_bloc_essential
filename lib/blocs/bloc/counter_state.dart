@@ -1,13 +1,15 @@
-part of 'counter_cubit.dart';
+part of 'counter_bloc.dart';
 
 class CounterState extends Equatable {
   final int counter;
 
   CounterState({required this.counter});
-
   factory CounterState.initial() {
     return CounterState(counter: 0);
   }
+
+  @override
+  List<Object?> get props => [counter];
 
   CounterState copyWith({
     int? counter,
@@ -19,7 +21,4 @@ class CounterState extends Equatable {
 
   @override
   String toString() => 'CounterState(counter: $counter)';
-
-  @override
-  List<Object> get props => [counter];
 }
