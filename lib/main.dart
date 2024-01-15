@@ -26,18 +26,27 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        title: 'anonymous_route',
-        debugShowCheckedModeBanner: false,
-        routes: {
-          '/': (context) => BlocProvider.value(
-                value: _counterCubit,
-                child: MyHomePage(),
-              ),
-          '/counter': (context) => BlocProvider.value(
-                value: _counterCubit,
-                child: CounterPage(),
-              )
-        });
+      title: 'generated_route',
+      debugShowCheckedModeBanner: false,
+      onGenerateRoute: (settings) {
+        switch (settings.name) {
+          case '/':
+            return MaterialPageRoute(
+                builder: (context) => BlocProvider.value(
+                      value: _counterCubit,
+                      child: MyHomePage(),
+                    ));
+          case '/counter':
+            return MaterialPageRoute(
+                builder: (context) => BlocProvider.value(
+                      value: _counterCubit,
+                      child: CounterPage(),
+                    ));
+          default:
+            return null;
+        }
+      },
+    );
   }
 }
 
@@ -48,7 +57,7 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('anonymous_route'),
+        title: Text('generated_route'),
       ),
       body: Center(
           child: Column(
