@@ -31,18 +31,20 @@ class MyHomePage extends StatelessWidget {
       body: Center(
           child: BlocProvider<CounterCubit>(
         create: (context) => CounterCubit(),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text("${context.watch<CounterCubit>().state.counter}",
-                style: TextStyle(fontSize: 52)),
-            ElevatedButton(
-                onPressed: () {
-                  context.read<CounterCubit>().increment();
-                },
-                child: Text('increment'))
-          ],
-        ),
+        child: Builder(builder: (context) {
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("${context.watch<CounterCubit>().state.counter}",
+                  style: TextStyle(fontSize: 52)),
+              ElevatedButton(
+                  onPressed: () {
+                    context.read<CounterCubit>().increment();
+                  },
+                  child: Text('increment'))
+            ],
+          );
+        }),
       )),
     );
   }
