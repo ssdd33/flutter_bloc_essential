@@ -1,4 +1,4 @@
-part of 'color_cubit.dart';
+part of 'color_bloc.dart';
 
 class ColorState extends Equatable {
   final Color color;
