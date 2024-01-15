@@ -41,8 +41,13 @@ class MyHomePage extends StatelessWidget {
             children: [
               ElevatedButton(
                   onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => CounterPage()));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => BlocProvider.value(
+                                  value: context.read<CounterCubit>(),
+                                  child: CounterPage(),
+                                )));
                   },
                   child: Text('show counter')),
               ElevatedButton(
