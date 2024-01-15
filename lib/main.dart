@@ -7,19 +7,37 @@ void main() {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MyApp extends StatefulWidget {
+  MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final CounterCubit _counterCubit = CounterCubit();
+
+  @override
+  void dispose() {
+    _counterCubit.close();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'anonymous_route',
-      debugShowCheckedModeBanner: false,
-      home: BlocProvider<CounterCubit>(
-        create: (context) => CounterCubit(),
-        child: MyHomePage(),
-      ),
-    );
+        title: 'anonymous_route',
+        debugShowCheckedModeBanner: false,
+        routes: {
+          '/': (context) => BlocProvider.value(
+                value: _counterCubit,
+                child: MyHomePage(),
+              ),
+          '/counter': (context) => BlocProvider.value(
+                value: _counterCubit,
+                child: CounterPage(),
+              )
+        });
   }
 }
 
@@ -33,31 +51,20 @@ class MyHomePage extends StatelessWidget {
         title: Text('anonymous_route'),
       ),
       body: Center(
-          child: BlocProvider<CounterCubit>(
-        create: (context) => CounterCubit(),
-        child: Builder(builder: (context) {
-          return Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => BlocProvider.value(
-                                  value: context.read<CounterCubit>(),
-                                  child: CounterPage(),
-                                )));
-                  },
-                  child: Text('show counter')),
-              ElevatedButton(
-                  onPressed: () {
-                    context.read<CounterCubit>().increment();
-                  },
-                  child: Text('increment'))
-            ],
-          );
-        }),
+          child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/counter');
+              },
+              child: Text('show counter')),
+          ElevatedButton(
+              onPressed: () {
+                context.read<CounterCubit>().increment();
+              },
+              child: Text('increment'))
+        ],
       )),
     );
   }
