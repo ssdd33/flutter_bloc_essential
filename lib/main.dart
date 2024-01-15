@@ -49,7 +49,7 @@ class MyHomePage extends StatelessWidget {
                 context.read<ColorBloc>().add(ChangeColorEvent());
               },
               child: Text("change color")),
-          Text("${context.read<CounterBloc>().state.counter}",
+          Text("${context.watch<CounterBloc>().state.counter}",
               style: TextStyle(fontSize: 52)),
           ElevatedButton(
               onPressed: () {
