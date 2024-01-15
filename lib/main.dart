@@ -1,53 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_block/blocs/color/color_bloc.dart';
-import 'package:flutter_block/blocs/counter/counter_bloc.dart';
-import 'package:flutter_block/observer/app_bloc_observer.dart';
+import 'package:flutter_block/blocs/bloc/counter_bloc.dart';
 
 void main() {
-  Bloc.observer = AppBlocObserver();
   runApp(MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   MyApp({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  final CounterCubit _counterCubit = CounterCubit();
-
-  @override
-  void dispose() {
-    _counterCubit.close();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'generated_route',
-      debugShowCheckedModeBanner: false,
-      onGenerateRoute: (settings) {
-        switch (settings.name) {
-          case '/':
-            return MaterialPageRoute(
-                builder: (context) => BlocProvider.value(
-                      value: _counterCubit,
-                      child: MyHomePage(),
-                    ));
-          case '/counter':
-            return MaterialPageRoute(
-                builder: (context) => BlocProvider.value(
-                      value: _counterCubit,
-                      child: CounterPage(),
-                    ));
-          default:
-            return null;
-        }
-      },
+    return BlocProvider<CounterBloc>(
+      create: (context) => CounterBloc(),
+      child: MaterialApp(
+          title: 'event_transform',
+          debugShowCheckedModeBanner: false,
+          home: MyHomePage()),
     );
   }
 }
@@ -59,24 +28,28 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('generated_route'),
+        title: Text('event_transform'),
       ),
       body: Center(
-          child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/counter');
-              },
-              child: Text('show counter')),
-          ElevatedButton(
-              onPressed: () {
-                context.read<CounterCubit>().increment();
-              },
-              child: Text('increment'))
-        ],
-      )),
+        child: Text(
+          "${context.watch<CounterBloc>().state.counter}",
+          style: TextStyle(fontSize: 52),
+        ),
+      ),
+      floatingActionButton:
+          Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+        FloatingActionButton(
+            onPressed: () {
+              context.read<CounterBloc>().add(IncrementCounterEvent());
+            },
+            child: Icon(Icons.add)),
+        SizedBox(width: 10),
+        FloatingActionButton(
+            onPressed: () {
+              context.read<CounterBloc>().add(DecrementCounterEvent());
+            },
+            child: Icon(Icons.remove))
+      ]),
     );
   }
 }
