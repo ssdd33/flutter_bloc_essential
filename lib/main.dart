@@ -16,9 +16,7 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider<ColorCubit>(create: (context) => ColorCubit()),
         BlocProvider<CounterCubit>(
-          create: (context) => CounterCubit(
-            colorCubit: context.read<ColorCubit>(),
-          ),
+          create: (context) => CounterCubit(),
         ),
       ],
       child: MaterialApp(
@@ -30,34 +28,58 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key});
 
   @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  int incrementSize = 1;
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: context.watch<ColorCubit>().state.color,
-      appBar: AppBar(
-        title: Text('cubit2cubit'),
+    return BlocListener<ColorCubit, ColorState>(
+      listener: (context, state) {
+        if (state.color == Colors.red) {
+          incrementSize = 1;
+        }
+        if (state.color == Colors.green) {
+          incrementSize = 10;
+        }
+        if (state.color == Colors.blue) {
+          incrementSize = 100;
+        }
+        if (state.color == Colors.black) {
+          context.read<CounterCubit>().changeCounter(-100);
+          incrementSize = -100;
+        }
+      },
+      child: Scaffold(
+        backgroundColor: context.watch<ColorCubit>().state.color,
+        appBar: AppBar(
+          title: Text('cubit2cubit'),
+        ),
+        body: Center(
+            child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            ElevatedButton(
+                onPressed: () {
+                  context.read<ColorCubit>().changeColor();
+                },
+                child: Text("change color")),
+            Text("${context.watch<CounterCubit>().state.counter}",
+                style: TextStyle(fontSize: 52)),
+            ElevatedButton(
+                onPressed: () {
+                  context.read<CounterCubit>().changeCounter(incrementSize);
+                },
+                child: Text('increment'))
+          ],
+        )),
       ),
-      body: Center(
-          child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          ElevatedButton(
-              onPressed: () {
-                context.read<ColorCubit>().changeColor();
-              },
-              child: Text("change color")),
-          Text("${context.watch<CounterCubit>().state.counter}",
-              style: TextStyle(fontSize: 52)),
-          ElevatedButton(
-              onPressed: () {
-                context.read<CounterCubit>().changeCounter();
-              },
-              child: Text('increment'))
-        ],
-      )),
     );
   }
 }
