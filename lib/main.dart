@@ -1,8 +1,17 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_block/blocs/bloc/counter_bloc.dart';
+import 'package:flutter_block/blocs/counter/counter_bloc.dart';
+import 'package:flutter_block/blocs/theme/theme_bloc.dart';
+import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:path_provider/path_provider.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  HydratedBloc.storage = await HydratedStorage.build(
+      storageDirectory: kIsWeb
+          ? HydratedStorage.webStorageDirectory
+          : await getApplicationDocumentsDirectory());
   runApp(MyApp());
 }
 
@@ -11,12 +20,22 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<CounterBloc>(
-      create: (context) => CounterBloc(),
-      child: MaterialApp(
-          title: 'event_transform',
-          debugShowCheckedModeBanner: false,
-          home: MyHomePage()),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<CounterBloc>(create: (context) => CounterBloc()),
+        BlocProvider<ThemeBloc>(create: (context) => ThemeBloc())
+      ],
+      child: BlocBuilder<ThemeBloc, ThemeState>(
+        builder: (context, state) {
+          return MaterialApp(
+              title: 'bloc_hydrated',
+              theme: state.appTheme == AppTheme.light
+                  ? ThemeData.light()
+                  : ThemeData.dark(),
+              debugShowCheckedModeBanner: false,
+              home: MyHomePage());
+        },
+      ),
     );
   }
 }
@@ -28,27 +47,39 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('event_transform'),
+        title: Text('hydrated bloc '),
       ),
       body: Center(
         child: Text(
           "${context.watch<CounterBloc>().state.counter}",
-          style: TextStyle(fontSize: 52),
+          style: TextStyle(fontSize: 64),
         ),
       ),
       floatingActionButton:
           Row(mainAxisAlignment: MainAxisAlignment.end, children: [
         FloatingActionButton(
             onPressed: () {
+              context.read<ThemeBloc>().add(ChangeThemeEvent());
+            },
+            child: Icon(Icons.brightness_4_rounded)),
+        SizedBox(width: 5),
+        FloatingActionButton(
+            onPressed: () {
               context.read<CounterBloc>().add(IncrementCounterEvent());
             },
             child: Icon(Icons.add)),
-        SizedBox(width: 10),
+        SizedBox(width: 5),
         FloatingActionButton(
             onPressed: () {
               context.read<CounterBloc>().add(DecrementCounterEvent());
             },
-            child: Icon(Icons.remove))
+            child: Icon(Icons.remove)),
+        SizedBox(width: 5),
+        FloatingActionButton(
+            onPressed: () {
+              HydratedBloc.storage.clear();
+            },
+            child: Icon(Icons.delete_forever))
       ]),
     );
   }
